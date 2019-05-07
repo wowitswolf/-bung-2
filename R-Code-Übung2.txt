@@ -1,0 +1,54 @@
+# Parameter "text" und "k" werden definiert
+text <- "CGGAAGCGAGATTCGCGTGGCGTGATTCCGGCGGGCGTGGAGAAGCGAGATTCATTCAAGCCGGGAGGCGTGGCGTGGCGTGGCGTGCGGATTCAAGCCGGCGGGCGTGATTCGAGCGGCGGATTCGAGATTCCGGGCGTGCGGGCGTGAAGCGCGTGGAGGAGGCGTGGCGTGCGGGAGGAGAAGCGAGAAGCCGGATTCAAGCAAGCATTCCGGCGGGAGATTCGCGTGGAGGCGTGGAGGCGTGGAGGCGTGCGGCGGGAGATTCAAGCCGGATTCGCGTGGAGAAGCGAGAAGCGCGTGCGGAAGCGAGGAGGAGAAGCATTCGCGTGATTCCGGGAGATTCAAGCATTCGCGTGCGGCGGGAGATTCAAGCGAGGAGGCGTGAAGCAAGCAAGCAAGCGCGTGGCGTGCGGCGGGAGAAGCAAGCGCGTGATTCGAGCGGGCGTGCGGAAGCGAGCGG" #Sample Dataset einsetzen
+k <- 12 #es wird nach 4meren untersucht
+
+#in der Funktion frequent_words wird durch den Eingabeparameter "text" das Dataframe angegeben, in dem das "most frequent pattern" gesucht werden soll
+#der Parameter "k" gibt die k-Mer-Zahl an (in unserem Fall k=4)
+#Ausgabe: die Funktion gibt die häufigst auftretenden k-Mere aus, die im "text" auftreten
+frequent_words <- function (text, k) {
+  
+  #die Liste "frequent_patterns" wird mit dem "text" initialisiert
+  frequent_patterns <- {} 
+  #die Liste "count" wird mit "k" initialisiert
+  count <- {} 
+  
+  #Anzahl der Iterationen vor Beginn der Schleife festgelegt auf 0
+  #Infos zu "for" https://www.rdocumentation.org/packages/base/versions/3.3.0/topics/Control
+  #Mittels nchar die Anzahl der Iterationen nach Ende der Schleife auf "nchar(text)-k" gesetzt. nchar gibt die Zahl der Buchstaben in "text" an
+  #Infos zu "nchar" https://www.rdocumentation.org/packages/base/versions/3.6.0/topics/nchar
+  for (i in 0: (nchar (text) - k)){
+    pattern <- substr (text, i+1, i+k)  #der Variable "pattern" wird mittels der Funktion "substr" der Wert "text, i+1, i+k" zugewiesen
+                                        #Infos zu "substr": https://www.rdocumentation.org/packages/base/versions/3.6.0/topics/substr
+    count [i+1] <- pattern_count (text, pattern) #"count" zählt jedes Pattern welches im Text vorkommt
+  }
+  
+  #in "max_count" wird festgelegt mit "max()" was das Maximum an Zählung ist
+  max_count <- max(count)
+  #dafür wird Anzahl der Iterationen vor Schleife wieder auf 0 gesetzt und nach der Schleife wieder auf "(nchar(text)-k)"
+  #siehe vorherige Schleife 
+  for (i in 0: (nchar(text)-k)){
+    if (count[i+1] == max_count) #Bedingung durch "if" angegeben, Bedingung= "wenn count [i+1]= max_count, dann werden Elemente zu Vektor hinzugefügt"...siehe nächste Bemerkung
+      frequent_patterns <- append (frequent_patterns, substr(text, i+1, i+k)) #falls vorangehende Bedingung erfüllt, dann wird zu "frequent_patterns" mit Befehl "append" der Wert "text, i+1, i+k" hinzugefügt
+                                                                              #Infos zu "append": https://www.rdocumentation.org/packages/base/versions/3.6.0/topics/append
+  }
+  #return gibt das Ergebnis aus, "unique" sorgt dafür, dass Duplikate von Elementen in dem ausgegebenen Vektor/Data Frame/Array weggelassen werden
+  #Unser Ergebnis zeigt die meist vorhandenen Pattern
+  return (unique(frequent_patterns)) 
+}
+frequent_words (text, k) #Ausgabe des Ergebnisses von "frequent_words"
+
+#in der Funktion "pattern_count" wird durch den Eingabeparameter "text" das Dataframe angegeben, in dem das "most frequent pattern" gesucht werden soll
+#der Parameter "pattern" stellt die möglichen Pattern dar, die in unserem Data Frame auftreten
+#Ausgabe: die Funktion gibt an, wie oft die Pattern in unserem Data Frame auftreten
+pattern_count <- function (text, pattern) {
+  
+  count <- 0 #die Liste "count" wird auf 0 gesetzt
+  pattern_length <- nchar (pattern) #in "pattern_length" wird per nchar die Anzahl der Buchstaben in "pattern" eingefügt 
+  #Anzahl der Iterationen vor Beginn der Schleife auf 0 gesetzt, Anzahl der Iterationen nach Beginn der Schleife auf "nchar(text)-pattern_length" gesetzt
+  for (i in 0: (nchar(text) - pattern_length)){
+    if (substr(rep(text), i+1, i+ pattern_length) == pattern) #Bedingung: wenn die gerade auf dem Data Frame angeschaute Pattern = "pattern", dann siehe nächste Bemerkung
+      count <- count + 1 #dann wird auf "count" (die Anzahl der Patterns) +1 addiert
+  }
+  #return gibt das Ergebnis aus, unser Ergebnis gibt die Anzahl der Patterns aus
+  return (count)
+}
